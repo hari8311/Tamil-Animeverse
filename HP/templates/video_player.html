@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Video Player</title>
+    <style>
+        body {
+            margin: 0;
+            background: #05060a;
+            color: #e6eef8;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .video-container {
+            position: absolute;
+            top: 50%;
+            left: 5%; /* Align to the left */
+            transform: translateY(-50%);
+            width: 65%;
+            background: black;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .video-container:hover .controls,
+        .video-container:hover .progress-bar {
+            opacity: 1;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 15px 12px 8px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .controls button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        .controls button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .controls button svg {
+            pointer-events: none;
+        }
+
+        .controls select {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: black;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .controls select:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .controls select option {
+            background: white;
+            color: black;
+        }
+
+        .controls input[type="range"] {
+            width: 0;
+            opacity: 0;
+            transition: width 0.2s, opacity 0.2s;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-container:hover input[type="range"] {
+            width: 70px;
+            opacity: 1;
+            margin-left: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: linear-gradient(to right, #ff0000 0%, #ff0000 var(--volume-percent, 100%), rgba(255, 255, 255, 0.3) var(--volume-percent, 100%), rgba(255, 255, 255, 0.3) 100%);
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 55px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            opacity: 0;
+            transition: height 0.2s, opacity 0.3s;
+        }
+
+        .progress-bar:hover {
+            height: 8px;
+        }
+
+        .progress-bar-filled {
+            width: 0;
+            height: 100%;
+            background: #ff0000;
+            position: relative;
+        }
+
+        .progress-bar-filled::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background: #ff0000;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .progress-bar:hover .progress-bar-filled::after {
+            opacity: 1;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .playlist-container {
+            position: absolute;
+            top: 50%;
+            right: 0; /* No gap between player and episodes box */
+            transform: translateY(-50%);
+            width: 25%; /* Reduced width of the episodes box */
+            height: 80%;
+            background: #0f1720;
+            overflow-y: auto;
+            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .playlist-container h2 {
+            color: white;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .playlist-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .playlist-container li {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .playlist-container li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .playlist-container img {
+            width: 60px;
+            height: 40px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        .playlist-container .active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .watermark {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 10;
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 80px;
+            height: auto;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="anime-title">Anime Video Player</h1>
+    <div class="video-container">
+        <img src="/static/uploads/Logo.jpeg" alt="Logo" class="logo">
+        <div class="watermark">TA</div>
+        <video id="anime-video">
+            <source id="video-source" src="" type="video/x-matroska">
+            Your browser does not support the video tag.
+        </video>
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-bar-filled" id="progress-bar-filled"></div>
+        </div>
+        <div class="controls">
+            <div class="controls-left">
+                <button id="play-pause">▶</button>
+                <div class="volume-container">
+                    <button id="mute-button" title="Mute/Unmute" style="width:auto;height:auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
+                            <path id="speaker-icon" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                    </button>
+                    <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+                </div>
+                <span class="time-display"><span id="current-time">0:00</span> / <span id="duration">0:00</span></span>
+            </div>
+            <div class="controls-right">
+                <select id="playback-speed">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+                <button id="download-video" title="Download Video">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
+                        <path d="M12 16l4-5h-3V4h-2v7H8l4 5zm-8 2v2h16v-2H4z"/>
+                    </svg>
+                </button>
+                <button id="fullscreen">⛶</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="playlist-container">
+        <h2>Episodes</h2>
+        <ul id="playlist">
+            <!-- Playlist items will be dynamically added here -->
+        </ul>
+    </div>
+
+    <script>
+        const video = document.getElementById('anime-video');
+        const playPauseButton = document.getElementById('play-pause');
+        const muteButton = document.getElementById('mute-button');
+        const speakerIcon = document.getElementById('speaker-icon');
+        const volumeSlider = document.getElementById('volume');
+        const playbackSpeed = document.getElementById('playback-speed');
+        const fullscreenButton = document.getElementById('fullscreen');
+        const downloadButton = document.getElementById('download-video');
+        const progressBar = document.getElementById('progress-bar');
+        const progressBarFilled = document.getElementById('progress-bar-filled');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const durationDisplay = document.getElementById('duration');
+        const playlistContainer = document.getElementById('playlist');
+        
+        // Video error handling
+        video.addEventListener('error', (e) => {
+            console.error('Video error:', e);
+            console.error('Video error code:', video.error ? video.error.code : 'unknown');
+            console.error('Video error message:', video.error ? video.error.message : 'unknown');
+            alert('Error loading video. Your browser may not support MKV format. Error code: ' + (video.error ? video.error.code : 'unknown'));
+        });
+        
+        video.addEventListener('loadstart', () => {
+            console.log('Video loading started:', video.src);
+        });
+        
+        video.addEventListener('loadeddata', () => {
+            console.log('Video data loaded successfully');
+        });
+        
+        video.addEventListener('canplay', () => {
+            console.log('Video can start playing');
+        });
+        
+        // Mute/Unmute functionality
+        muteButton.addEventListener('click', () => {
+            video.muted = !video.muted;
+            if (video.muted) {
+                speakerIcon.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+                volumeSlider.value = 0;
+            } else {
+                speakerIcon.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+                volumeSlider.value = video.volume;
+            }
+        });
+        
+        // Download video functionality
+        downloadButton.addEventListener('click', () => {
+            const videoSrc = video.currentSrc || video.src;
+            if (videoSrc) {
+                const a = document.createElement('a');
+                a.href = videoSrc;
+                a.download = videoSrc.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert('No video loaded to download.');
+            }
+        });
+
+        // Play/Pause functionality
+        playPauseButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (video.paused) {
+                playPauseButton.textContent = '❚❚';
+                video.play().catch(err => console.error('Play error:', err));
+            } else {
+                playPauseButton.textContent = '▶';
+                video.pause();
+            }
+        });
+
+        // Also sync button state when video plays/pauses from other sources
+        video.addEventListener('play', () => {
+            playPauseButton.textContent = '❚❚';
+        });
+
+        video.addEventListener('pause', () => {
+            playPauseButton.textContent = '▶';
+        });
+
+        // Click on video to play/pause, double-click for fullscreen
+        let clickTimer = null;
+        video.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (clickTimer === null) {
+                clickTimer = setTimeout(() => {
+                    clickTimer = null;
+                    // Single click - play/pause
+                    if (video.paused) {
+                        playPauseButton.textContent = '❚❚';
+                        video.play().catch(err => console.error('Play error:', err));
+                    } else {
+                        playPauseButton.textContent = '▶';
+                        video.pause();
+                    }
+                }, 250);
+            } else {
+                // Double click - fullscreen
+                clearTimeout(clickTimer);
+                clickTimer = null;
+                if (!document.fullscreenElement) {
+                    video.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            video.volume = e.target.value;
+            video.muted = false;
+            const percent = e.target.value * 100;
+            volumeSlider.style.setProperty('--volume-percent', `${percent}%`);
+            if (e.target.value == 0) {
+                speakerIcon.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+            } else {
+                speakerIcon.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+            }
+        });
+
+        // Playback speed control
+        playbackSpeed.addEventListener('change', (e) => {
+            video.playbackRate = e.target.value;
+        });
+
+        // Fullscreen toggle
+        fullscreenButton.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                video.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Progress bar functionality
+        video.addEventListener('timeupdate', () => {
+            const progress = (video.currentTime / video.duration) * 100;
+            progressBarFilled.style.width = `${progress}%`;
+
+            // Update current time display
+            const currentMinutes = Math.floor(video.currentTime / 60);
+            const currentSeconds = Math.floor(video.currentTime % 60);
+            currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
+
+            // Update duration display
+            if (!isNaN(video.duration)) {
+                const durationMinutes = Math.floor(video.duration / 60);
+                const durationSeconds = Math.floor(video.duration % 60);
+                durationDisplay.textContent = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+            }
+        });
+
+        // Progress bar click to seek
+        progressBar.addEventListener('click', (e) => {
+            const newTime = (e.offsetX / progressBar.offsetWidth) * video.duration;
+            video.currentTime = newTime;
+        });
+
+        // Progress bar dragging functionality
+        let isDragging = false;
+        
+        progressBar.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            const newTime = (e.offsetX / progressBar.offsetWidth) * video.duration;
+            video.currentTime = newTime;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const rect = progressBar.getBoundingClientRect();
+                const offsetX = e.clientX - rect.left;
+                const newTime = Math.max(0, Math.min(1, offsetX / rect.width)) * video.duration;
+                video.currentTime = newTime;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Fetch episodes dynamically from the backend
+        fetch(`/api/episodes?anime=jujutsu%20kaisen`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch episodes: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const episodes = data.episodes;
+                if (episodes.length === 0) {
+                    console.error('No episodes found');
+                    return;
+                }
+                
+                episodes.forEach((ep, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.className = index === 0 ? 'active' : '';
+
+                    const thumbnail = document.createElement('img');
+                    // Generate thumbnail from video's 3rd second frame
+                    const tempVideo = document.createElement('video');
+                    tempVideo.src = `/play/jujutsu%20kaisen/${encodeURIComponent(ep)}`;
+                    tempVideo.currentTime = 3;
+                    tempVideo.addEventListener('loadeddata', () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 120;
+                        canvas.height = 80;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(tempVideo, 0, 0, 120, 80);
+                        thumbnail.src = canvas.toDataURL();
+                    });
+                    thumbnail.alt = ep;
+
+                    const title = document.createElement('span');
+                    title.textContent = `Episode ${index + 1}`;
+
+                    listItem.appendChild(thumbnail);
+                    listItem.appendChild(title);
+                    listItem.addEventListener('click', () => {
+                        console.log('Loading episode:', ep);
+                        video.src = `/play/jujutsu%20kaisen/${encodeURIComponent(ep)}`;
+                        video.load();
+                        video.play().catch(err => console.error('Play error:', err));
+
+                        document.querySelectorAll('.playlist-container li').forEach(li => li.classList.remove('active'));
+                        listItem.classList.add('active');
+                    });
+
+                    playlistContainer.appendChild(listItem);
+                });
+                
+                // Load the first episode automatically
+                if (episodes.length > 0) {
+                    console.log('Auto-loading first episode:', episodes[0]);
+                    video.src = `/play/jujutsu%20kaisen/${encodeURIComponent(episodes[0])}`;
+                    video.load();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching episodes:', error);
+            });
+    </script>
+</body>
+</html>
