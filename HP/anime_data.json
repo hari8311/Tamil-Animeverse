@@ -1,0 +1,55 @@
+[
+  {
+    "id": 1,
+    "title": "Dragon Ball",
+    "genre": "Action, Adventure, Fantasy",
+    "image": "Dragon Ball.jpeg",
+    "description": "Follow Goku's adventures as he searches for the Dragon Balls.",
+    "seasons": {
+      "Season 1": [
+        {"episode": 1, "file": "dragon ball/dragon ball season 1,ep2.webm"},
+        {"episode": 2, "file": "dragon ball/dragon ball season 1,ep2.webm"}
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "title": "Naruto Classic",
+    "genre": "Action, Shonen",
+    "image": "Naruto.jpg",
+    "description": "The story of a young ninja seeking recognition.",
+    "seasons": {}
+  },
+  {
+    "id": 3,
+    "title": "Attack on Titan",
+    "genre": "Action, Drama",
+    "image": "AOT.webp",
+    "description": "Humanity fights against giant humanoid creatures.",
+    "seasons": {}
+  },
+  {
+    "id": 4,
+    "title": "One Piece",
+    "genre": "Action, Adventure",
+    "image": "One piece.jpeg",
+    "description": "The epic journey of Luffy to become Pirate King.",
+    "seasons": {}
+  },
+  {
+    "id": 5,
+    "title": "Pokemon",
+    "genre": "Animation, Action, Adventure",
+    "image": "Pokemon.jpg",
+    "description": "Ash's journey to catch all Pokemon.",
+    "seasons": {}
+  },
+  {
+    "id": 6,
+    "title": "Jujutsu Kaisen",
+    "genre": "Action, Supernatural, Dark Fantasy",
+    "image": "jujutsu kaisen.jpeg",
+    "description": "A high schooler swallows a cursed finger and joins a secret organization of jujutsu sorcerers.",
+    "seasons": {}
+  }
+]
