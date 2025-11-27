@@ -356,27 +356,37 @@
 
 <script src="static/ani.js"></script>
 <script>
-  // Search functionality for library items
- // Replace existing search code with this if you want backend search
-const searchInput = document.getElementById('searchInput');
-const library = document.querySelector('.grid');
+  // Search functionality for library items - automatic filtering as you type
+  const searchInput = document.getElementById('searchInput');
+  const library = document.querySelector('.grid');
 
-searchInput.addEventListener('input', async (e) => {
-  const query = e.target.value;
-  const response = await fetch(`/api/search?q=${query}`);
-  const data = await response.json();
-
-  library.innerHTML = data.map(anime => `
-    <article class="card tile hover-pop small library-item">
-      <img src="static/${anime.title.split(' ')[0]}.jpg" alt="${anime.title}">
-      <div class="meta">
-        <h4>${anime.title}</h4>
-        <p>${anime.genre}</p>
-        <button class="play glow-btn">Play Dub</button>
-      </div>
-    </article>
-  `).join('');
-});
+  searchInput.addEventListener('input', async (e) => {
+    const query = e.target.value.trim();
+    
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        library.innerHTML = data.results.map(anime => `
+          <article class="card tile hover-pop small library-item">
+            <img src="static/uploads/${anime.image}" alt="${anime.title}">
+            <div class="meta">
+              <h4>${anime.title}</h4>
+              <p>${anime.genre}</p>
+              <a href="/video_player?anime=${encodeURIComponent(anime.title.toLowerCase())}&episode=">
+                <button class="play glow-btn">Play Dub</button>
+              </a>
+            </div>
+          </article>
+        `).join('');
+      } else {
+        library.innerHTML = '<p style="color: var(--muted); text-align: center; width: 100%; padding: 2rem;">No anime found matching your search.</p>';
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    }
+  });
 
   function openVideoPlayer(anime, episode) {
     const videoPlayer = document.getElementById('videoPlayer');

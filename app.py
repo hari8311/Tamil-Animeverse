@@ -40,6 +40,30 @@ def get_episodes():
     print(f"Episodes found: {episodes}")
     return {"episodes": episodes}, 200
 
+# Route to search anime
+@app.route('/api/search')
+def search_anime():
+    query = request.args.get('q', '').lower()
+    
+    # Define your anime library
+    anime_library = [
+        {"title": "Naruto", "genre": "Action, Adventure", "image": "Naruto.jpg"},
+        {"title": "One Piece", "genre": "Action, Adventure", "image": "One piece.jpeg"},
+        {"title": "Dragon Ball", "genre": "Action, Martial Arts", "image": "Dragon Ball.jpeg"},
+        {"title": "Pokemon", "genre": "Adventure, Fantasy", "image": "Pokemon.jpg"},
+        {"title": "AOT", "genre": "Action, Dark Fantasy", "image": "AOT.webp"},
+        {"title": "Jujutsu Kaisen", "genre": "Action, Supernatural", "image": "jujutsu kaisen.jpeg"}
+    ]
+    
+    # Filter based on query
+    if query:
+        filtered = [anime for anime in anime_library 
+                   if query in anime['title'].lower() or query in anime['genre'].lower()]
+    else:
+        filtered = anime_library
+    
+    return {"results": filtered}, 200
+
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
