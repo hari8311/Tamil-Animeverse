@@ -1,14 +1,13 @@
 .venv/
 __pycache__/
 
-# Exclude large video files
+# Ignore large video directories and common video formats
 HP/static/video/
+*.mp4
+*.mkv
+*.webm
+*.avi
 
-# Python files
-*.pyc
-*.pyo
-*.pyd
+# Local settings
+.env
 
-# OS files
-.DS_Store
-Thumbs.db
