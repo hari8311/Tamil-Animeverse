@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>TA — Tamil Animeverse · Tamil Anime Dubs</title>
+<link href="static/uploads/Logo.jpeg" rel="icon" type="image/jpeg"/>
+</head>
+<body>
+<!-- Static copy of homepage for GitHub Pages. Backend features (Flask routes) are not available here. -->
+<video id="bgVideo" autoplay muted loop playsinline preload="metadata">
+  <source src="static/uploads/bg.mp4" type="video/mp4" />
+</video>
+<div class="container">
+  <header>
+    <div class="brand">
+      <img alt="Tamil Animeverse Logo" src="static/uploads/Logo.jpeg" style="width:50px;height:50px;border-radius:10px;"/>
+      <div>
+        <h1>TAMIL ANIMEVERSE</h1>
+        <p>தமிழ் அனிமே டப்ஸ் — Official &amp; Fan Dubs</p>
+      </div>
+    </div>
+    <input id="searchInput" placeholder="Search anime..." type="text"/>
+  </header>
+  <section id="library">
+    <h3>Dub Library</h3>
+    <div class="grid" id="grid"></div>
+  </section>
+</div>
+<script>
+  const data = [
+    {title:"Naruto", genre:"Action, Shonen", image:"Naruto.jpg"},
+    {title:"One Piece", genre:"Action, Adventure", image:"One piece.jpeg"},
+    {title:"Dragon Ball Classic", genre:"Adventure,Fantasy", image:"Dragon Ball.jpeg"},
+    {title:"Pokemon", genre:"Animation, Action, Adventure", image:"Pokemon.jpg"},
+    {title:"Attack on Titan", genre:"Animation, Action, Drama", image:"AOT.webp"},
+    {title:"Jujutsu Kaisen", genre:"Action, Supernatural", image:"jujutsu kaisen.jpeg"}
+  ];
+  const grid = document.getElementById('grid');
+  const searchInput = document.getElementById('searchInput');
+  function render(list){
+    grid.innerHTML = list.map(anime => `
+      <article class="card">
+        <img src="static/uploads/${anime.image}" alt="${anime.title}" style="width:150px;height:auto;border-radius:8px;"/>
+        <div class="meta">
+          <h4>${anime.title}</h4>
+          <p>${anime.genre}</p>
+        </div>
+      </article>
+    `).join('');
+  }
+  render(data);
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    render(data.filter(a => a.title.toLowerCase().includes(q) || a.genre.toLowerCase().includes(q)));
+  });
+  // Slow background
+  (function(){
+    const v = document.getElementById('bgVideo');
+    if (v) v.playbackRate = 0.6;
+  })();
+</script>
+</body>
+</html>
