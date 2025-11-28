@@ -64,6 +64,15 @@ def search_anime():
     
     return {"results": filtered}, 200
 
+# SEO files: robots.txt and sitemap.xml
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory('.', 'robots.txt')
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    return send_from_directory('.', 'sitemap.xml')
+
 # Run the app
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Render sets PORT env variable

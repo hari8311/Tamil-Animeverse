@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tamil-animeverse.onrender.com/sitemap.xml
