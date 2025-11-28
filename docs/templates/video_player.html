@@ -63,6 +63,13 @@
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             cursor: pointer;
+            transition: width 0.3s ease;
+        }
+
+        .video-container.full-width {
+            width: 90%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .video-container:hover .controls,
@@ -261,6 +268,11 @@
             overflow-y: auto;
             box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 10px;
+            transition: opacity 0.3s ease;
+        }
+
+        .playlist-container.hidden {
+            display: none;
         }
 
         .playlist-container h2 {
@@ -391,6 +403,8 @@
         const currentTimeDisplay = document.getElementById('current-time');
         const durationDisplay = document.getElementById('duration');
         const playlistContainer = document.getElementById('playlist');
+        const playlistBox = document.querySelector('.playlist-container');
+        const videoContainer = document.querySelector('.video-container');
         
         // Video error handling
         video.addEventListener('error', (e) => {
@@ -566,6 +580,9 @@
             console.log('Using external source for playback:', srcParam);
             video.src = srcParam;
             video.load();
+            // Hide playlist for external sources
+            playlistBox.classList.add('hidden');
+            videoContainer.classList.add('full-width');
         } else {
             const animeForFetch = animeParam ? encodeURIComponent(animeParam) : 'jujutsu%20kaisen';
             // Fetch episodes dynamically from the backend
@@ -581,6 +598,12 @@
                 if (episodes.length === 0) {
                     console.error('No episodes found');
                     return;
+                }
+                
+                // Hide playlist if only one episode (movie)
+                if (episodes.length === 1) {
+                    playlistBox.classList.add('hidden');
+                    videoContainer.classList.add('full-width');
                 }
                 
                 episodes.forEach((ep, index) => {
