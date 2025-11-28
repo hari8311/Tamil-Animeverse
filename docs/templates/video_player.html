@@ -341,8 +341,8 @@
     <div class="video-container">
         <img src="/static/uploads/Logo.jpeg" alt="Logo" class="logo">
         <div class="watermark">TA</div>
-        <video id="anime-video">
-            <source id="video-source" src="" type="video/x-matroska">
+        <video id="anime-video" crossorigin="anonymous">
+            <source id="video-source" src="" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="progress-bar" id="progress-bar">
@@ -613,6 +613,9 @@
         // If an external src is provided, use it directly; otherwise fetch episodes for the selected anime
         if (srcParam) {
             console.log('Using external source for playback:', srcParam);
+            // Remove type attribute to let browser auto-detect
+            const source = document.getElementById('video-source');
+            source.removeAttribute('type');
             video.src = srcParam;
             video.load();
             // Hide playlist for external sources
