@@ -362,6 +362,9 @@
                 <span class="time-display"><span id="current-time">0:00</span> / <span id="duration">0:00</span></span>
             </div>
             <div class="controls-right">
+                <select id="audio-track" style="display:none;">
+                    <option value="">Audio</option>
+                </select>
                 <select id="playback-speed">
                     <option value="0.5">0.5x</option>
                     <option value="1" selected>1x</option>
@@ -395,6 +398,7 @@
         const muteButton = document.getElementById('mute-button');
         const speakerIcon = document.getElementById('speaker-icon');
         const volumeSlider = document.getElementById('volume');
+        const audioTrackSelect = document.getElementById('audio-track');
         const playbackSpeed = document.getElementById('playback-speed');
         const fullscreenButton = document.getElementById('fullscreen');
         const downloadButton = document.getElementById('download-video');
@@ -405,6 +409,37 @@
         const playlistContainer = document.getElementById('playlist');
         const playlistBox = document.querySelector('.playlist-container');
         const videoContainer = document.querySelector('.video-container');
+        
+        // Audio track switcher - populate when video loads
+        video.addEventListener('loadedmetadata', () => {
+            const audioTracks = video.audioTracks;
+            if (audioTracks && audioTracks.length > 1) {
+                audioTrackSelect.style.display = 'block';
+                audioTrackSelect.innerHTML = '<option value="">Audio</option>';
+                
+                for (let i = 0; i < audioTracks.length; i++) {
+                    const track = audioTracks[i];
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = track.label || track.language || `Track ${i + 1}`;
+                    if (track.enabled) option.selected = true;
+                    audioTrackSelect.appendChild(option);
+                }
+            } else {
+                audioTrackSelect.style.display = 'none';
+            }
+        });
+        
+        // Audio track change handler
+        audioTrackSelect.addEventListener('change', (e) => {
+            const audioTracks = video.audioTracks;
+            if (audioTracks && e.target.value !== '') {
+                const selectedIndex = parseInt(e.target.value);
+                for (let i = 0; i < audioTracks.length; i++) {
+                    audioTracks[i].enabled = (i === selectedIndex);
+                }
+            }
+        });
         
         // Video error handling
         video.addEventListener('error', (e) => {
