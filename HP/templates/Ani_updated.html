@@ -28,13 +28,16 @@
       min-height: 100vh;
     }
 
-    /* ✨ Animated Particle Background */
-    canvas#bg {
+    /* ✨ Background Video */
+    video#bgVideo {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
+      object-fit: cover;
       z-index: -1;
-      background: radial-gradient(circle at top, #05060a, #01030a);
+      filter: brightness(0.35) saturate(1.1);
+      background: #01030a;
+      pointer-events: none;
     }
 
     /* --- Animation classes --- */
@@ -264,7 +267,14 @@
   </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
+<video id="bgVideo" autoplay muted loop playsinline preload="metadata">
+  <source src="static/uploads/bg.mp4" type="video/mp4" />
+  <!-- Fallback text if video cannot be played -->
+  Your browser does not support the background video.
+  <!-- Optional: add a WebM source if you have it
+  <source src="static/uploads/bg.webm" type="video/webm" />
+  -->
+</video>
 <div class="container fade-in">
 <header class="slide-down">
 <div class="brand">
