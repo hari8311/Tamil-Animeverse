@@ -56,7 +56,7 @@ def search_anime():
         {"title": "Pokemon", "genre": "Adventure, Fantasy", "image": "Pokemon.jpg"},
         {"title": "AOT", "genre": "Action, Dark Fantasy", "image": "AOT.webp"},
         {"title": "Jujutsu Kaisen", "genre": "Action, Supernatural", "image": "jujutsu kaisen.jpeg"},
-        {"title": "My Hero Academia Two Heros", "genre": "Action, Superhero", "image": "Logo.jpeg"}
+        {"title": "My Hero Academia Two Heros", "genre": "Action, Superhero", "image": "My Hero Academia Two Heros.jpg"}
     ]
     
     # Filter based on query
