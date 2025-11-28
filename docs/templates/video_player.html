@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Video Player</title>
+        <title>{% if anime and episode %}{{ anime|title }} — {{ episode }} | Tamil Animeverse{% else %}Anime Video Player | Tamil Animeverse{% endif %}</title>
+        <meta name="description" content="{% if anime %}Watch {{ anime|title }} Tamil dub{% if episode %} — {{ episode }}{% endif %} on Tamil Animeverse.{% else %}Watch Tamil anime dubs on Tamil Animeverse.{% endif %}">
+        <link rel="canonical" href="{{ request.url }}">
+        <meta property="og:title" content="{% if anime and episode %}{{ anime|title }} — {{ episode }}{% else %}Anime Video Player{% endif %}">
+        <meta property="og:description" content="{% if anime %}Watch {{ anime|title }} Tamil dub{% if episode %} — {{ episode }}{% endif %}.{% else %}Watch Tamil anime dubs.{% endif %}">
+        <meta property="og:type" content="video.other">
+        <meta property="og:url" content="{{ request.url }}">
+        <meta property="og:image" content="{{ url_for('static', filename='uploads/Logo.jpeg', _external=True) }}">
+        {% if anime and episode %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": "{{ anime|title }} — {{ episode }}",
+            "description": "Watch {{ anime|title }} Tamil Dub — {{ episode }} on Tamil Animeverse.",
+            "thumbnailUrl": ["{{ url_for('static', filename='uploads/Logo.jpeg', _external=True) }}"],
+            "uploadDate": "{{ upload_date }}",
+            "embedUrl": "{{ request.url }}",
+            "contentUrl": "{{ url_for('play_video', anime=anime, episode=episode, _external=True) }}"
+        }
+        </script>
+        {% endif %}
     <style>
         body {
             margin: 0;
@@ -290,7 +311,7 @@
     </style>
 </head>
 <body>
-    <h1 id="anime-title">Anime Video Player</h1>
+    <h1 id="anime-title">{% if anime %}{{ anime|title }}{% else %}Anime Video Player{% endif %}</h1>
     <div class="video-container">
         <img src="/static/uploads/Logo.jpeg" alt="Logo" class="logo">
         <div class="watermark">TA</div>

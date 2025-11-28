@@ -1,5 +1,6 @@
 from flask import Flask, render_template, send_from_directory, request
 import os
+from datetime import date
 
 app = Flask(__name__, static_folder='docs/static', template_folder='docs/templates')
 
@@ -19,7 +20,8 @@ def play_video(anime, episode):
 def video_player():
     anime = request.args.get('anime')
     episode = request.args.get('episode')
-    return render_template('video_player.html', anime=anime, episode=episode)
+    upload_date = date.today().isoformat()
+    return render_template('video_player.html', anime=anime, episode=episode, upload_date=upload_date)
 
 # Route to fetch episodes for a given anime
 @app.route('/api/episodes')
