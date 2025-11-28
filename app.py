@@ -20,8 +20,9 @@ def play_video(anime, episode):
 def video_player():
     anime = request.args.get('anime')
     episode = request.args.get('episode')
+    src = request.args.get('src')
     upload_date = date.today().isoformat()
-    return render_template('video_player.html', anime=anime, episode=episode, upload_date=upload_date)
+    return render_template('video_player.html', anime=anime, episode=episode, src=src, upload_date=upload_date)
 
 # Route to fetch episodes for a given anime
 @app.route('/api/episodes')
@@ -54,7 +55,8 @@ def search_anime():
         {"title": "Dragon Ball", "genre": "Action, Martial Arts", "image": "Dragon Ball.jpeg"},
         {"title": "Pokemon", "genre": "Adventure, Fantasy", "image": "Pokemon.jpg"},
         {"title": "AOT", "genre": "Action, Dark Fantasy", "image": "AOT.webp"},
-        {"title": "Jujutsu Kaisen", "genre": "Action, Supernatural", "image": "jujutsu kaisen.jpeg"}
+        {"title": "Jujutsu Kaisen", "genre": "Action, Supernatural", "image": "jujutsu kaisen.jpeg"},
+        {"title": "My Hero Academia Two Heros", "genre": "Action, Superhero", "image": "Logo.jpeg"}
     ]
     
     # Filter based on query

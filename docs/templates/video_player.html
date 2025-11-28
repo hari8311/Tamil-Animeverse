@@ -25,6 +25,20 @@
         }
         </script>
         {% endif %}
+        {% if anime and src and not episode %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": "{{ anime|title }}",
+            "description": "Watch {{ anime|title }} Tamil Dub on Tamil Animeverse.",
+            "thumbnailUrl": ["{{ url_for('static', filename='uploads/Logo.jpeg', _external=True) }}"],
+            "uploadDate": "{{ upload_date }}",
+            "embedUrl": "{{ request.url }}",
+            "contentUrl": "{{ src }}"
+        }
+        </script>
+        {% endif %}
     <style>
         body {
             margin: 0;
@@ -360,6 +374,10 @@
     </div>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const animeParam = urlParams.get('anime');
+        const srcParam = urlParams.get('src');
+
         const video = document.getElementById('anime-video');
         const playPauseButton = document.getElementById('play-pause');
         const muteButton = document.getElementById('mute-button');
@@ -543,8 +561,15 @@
             isDragging = false;
         });
 
-        // Fetch episodes dynamically from the backend
-        fetch(`/api/episodes?anime=jujutsu%20kaisen`)
+        // If an external src is provided, use it directly; otherwise fetch episodes for the selected anime
+        if (srcParam) {
+            console.log('Using external source for playback:', srcParam);
+            video.src = srcParam;
+            video.load();
+        } else {
+            const animeForFetch = animeParam ? encodeURIComponent(animeParam) : 'jujutsu%20kaisen';
+            // Fetch episodes dynamically from the backend
+            fetch(`/api/episodes?anime=${animeForFetch}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Failed to fetch episodes: ${response.statusText}`);
@@ -565,7 +590,7 @@
                     const thumbnail = document.createElement('img');
                     // Generate thumbnail from video's 3rd second frame
                     const tempVideo = document.createElement('video');
-                    tempVideo.src = `/play/jujutsu%20kaisen/${encodeURIComponent(ep)}`;
+                    tempVideo.src = `/play/${animeForFetch}/${encodeURIComponent(ep)}`;
                     tempVideo.currentTime = 3;
                     tempVideo.addEventListener('loadeddata', () => {
                         const canvas = document.createElement('canvas');
@@ -584,7 +609,7 @@
                     listItem.appendChild(title);
                     listItem.addEventListener('click', () => {
                         console.log('Loading episode:', ep);
-                        video.src = `/play/jujutsu%20kaisen/${encodeURIComponent(ep)}`;
+                        video.src = `/play/${animeForFetch}/${encodeURIComponent(ep)}`;
                         video.load();
                         video.play().catch(err => console.error('Play error:', err));
 
@@ -598,13 +623,14 @@
                 // Load the first episode automatically
                 if (episodes.length > 0) {
                     console.log('Auto-loading first episode:', episodes[0]);
-                    video.src = `/play/jujutsu%20kaisen/${encodeURIComponent(episodes[0])}`;
+                    video.src = `/play/${animeForFetch}/${encodeURIComponent(episodes[0])}`;
                     video.load();
                 }
             })
             .catch(error => {
                 console.error('Error fetching episodes:', error);
             });
+        }
     </script>
 </body>
 </html>
