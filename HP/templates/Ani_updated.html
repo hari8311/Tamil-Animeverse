@@ -422,4 +422,23 @@
   }
 </script>
 </body>
+<script>
+  // Slow down background video playback
+  (function(){
+    const rate = 0.6; // adjust speed here (1.0 = normal)
+    function applyRate() {
+      const vid = document.getElementById('bgVideo');
+      if (!vid) return;
+      try { vid.playbackRate = rate; } catch (_) {}
+    }
+    // Apply on DOM ready and when metadata is available
+    document.addEventListener('DOMContentLoaded', applyRate);
+    const v = document.getElementById('bgVideo');
+    if (v) {
+      v.addEventListener('loadedmetadata', applyRate);
+      v.addEventListener('play', applyRate);
+    }
+    applyRate();
+  })();
+  </script>
 </html>
