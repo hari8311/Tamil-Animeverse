@@ -73,6 +73,11 @@ def robots_txt():
 def sitemap_xml():
     return send_from_directory('.', 'sitemap.xml')
 
+# Google Search Console HTML file verification
+@app.route('/googlea891d11fb35a233a.html')
+def gsc_verification_file():
+    return send_from_directory('.', 'googlea891d11fb35a233a.html')
+
 # Run the app
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Render sets PORT env variable
