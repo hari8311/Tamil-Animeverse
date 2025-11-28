@@ -1,7 +1,7 @@
 from flask import Flask, render_template, send_from_directory, request
 import os
 
-app = Flask(__name__, static_folder='HP/static', template_folder='HP/templates')
+app = Flask(__name__, static_folder='docs/static', template_folder='docs/templates')
 
 # Route for the homepage
 @app.route('/')
@@ -11,7 +11,7 @@ def home():
 # Route to serve video files
 @app.route('/play/<anime>/<episode>')
 def play_video(anime, episode):
-    video_folder = f'HP/static/video/{anime}'
+    video_folder = f'docs/static/video/{anime}'
     return send_from_directory(video_folder, episode)
 
 # Route to render the video playback page
@@ -25,7 +25,7 @@ def video_player():
 @app.route('/api/episodes')
 def get_episodes():
     anime = request.args.get('anime')
-    video_folder = f'HP/static/video/{anime}'
+    video_folder = f'docs/static/video/{anime}'
 
     if not os.path.exists(video_folder):
         print(f"Directory not found: {video_folder}")
