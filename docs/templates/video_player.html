@@ -40,36 +40,64 @@
         </script>
         {% endif %}
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            background: #05060a;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 50%, #0f1419 100%);
             color: #e6eef8;
             font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #anime-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(90deg, #ef5d7a, #6b8cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(107, 140, 255, 0.3);
+        }
+
+        .player-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 95%;
+            max-width: 1800px;
+            align-items: flex-start;
         }
 
         .video-container {
-            position: absolute;
-            top: 50%;
-            left: 5%; /* Align to the left */
-            transform: translateY(-50%);
-            width: 65%;
-            background: black;
-            border-radius: 10px;
+            flex: 1;
+            position: relative;
+            background: #000;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-            transition: width 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6),
+                        0 0 60px rgba(107, 140, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .video-container.full-width {
-            width: 90%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        .video-container:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8),
+                        0 0 80px rgba(107, 140, 255, 0.3);
         }
 
         .video-container:hover .controls,
@@ -80,6 +108,7 @@
         video {
             width: 100%;
             height: auto;
+            display: block;
         }
 
         .controls {
@@ -88,45 +117,57 @@
             width: 100%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            padding: 15px 12px 8px;
+            gap: 12px;
+            background: linear-gradient(to top, 
+                rgba(0, 0, 0, 0.95) 0%, 
+                rgba(0, 0, 0, 0.8) 50%,
+                transparent 100%);
+            padding: 20px 16px 12px;
             box-sizing: border-box;
             opacity: 0;
             transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .controls-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .controls-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             margin-left: auto;
         }
 
         .controls button {
-            background: none;
-            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             cursor: pointer;
             font-size: 18px;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
+            backdrop-filter: blur(10px);
         }
 
         .controls button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(239, 93, 122, 0.3);
+            border-color: rgba(239, 93, 122, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 93, 122, 0.4);
+        }
+
+        .controls button:active {
+            transform: translateY(0);
         }
 
         .controls button svg {
@@ -134,29 +175,33 @@
         }
 
         .controls select {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: black;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
             cursor: pointer;
-            padding: 5px 8px;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
         }
 
         .controls select:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(107, 140, 255, 0.6);
+            box-shadow: 0 0 12px rgba(107, 140, 255, 0.4);
         }
 
         .controls select option {
-            background: white;
-            color: black;
+            background: #1a1f2e;
+            color: white;
         }
 
         .controls input[type="range"] {
             width: 0;
             opacity: 0;
-            transition: width 0.2s, opacity 0.2s;
+            transition: width 0.3s ease, opacity 0.3s ease;
             background: transparent;
             cursor: pointer;
         }
@@ -164,72 +209,89 @@
         .volume-container {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .volume-container:hover input[type="range"] {
-            width: 70px;
+            width: 80px;
             opacity: 1;
-            margin-left: 5px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
         }
 
         input[type="range"]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
+            height: 6px;
+            background: linear-gradient(to right, 
+                #ef5d7a 0%, 
+                #ef5d7a var(--volume-percent, 100%), 
+                rgba(255, 255, 255, 0.2) var(--volume-percent, 100%), 
+                rgba(255, 255, 255, 0.2) 100%);
+            border-radius: 3px;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 14px;
-            width: 14px;
+            height: 16px;
+            width: 16px;
             border-radius: 50%;
-            background: white;
+            background: linear-gradient(135deg, #ef5d7a, #ff9b6a);
             cursor: pointer;
             margin-top: -5px;
+            box-shadow: 0 0 8px rgba(239, 93, 122, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 16px rgba(239, 93, 122, 0.8);
         }
 
         input[type="range"]::-moz-range-track {
             width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
         }
 
         input[type="range"]::-moz-range-thumb {
-            height: 14px;
-            width: 14px;
+            height: 16px;
+            width: 16px;
             border-radius: 50%;
-            background: white;
+            background: linear-gradient(135deg, #ef5d7a, #ff9b6a);
             cursor: pointer;
             border: none;
-        }
-
-        input[type="range"]::-webkit-slider-runnable-track {
-            background: linear-gradient(to right, #ff0000 0%, #ff0000 var(--volume-percent, 100%), rgba(255, 255, 255, 0.3) var(--volume-percent, 100%), rgba(255, 255, 255, 0.3) 100%);
+            box-shadow: 0 0 8px rgba(239, 93, 122, 0.6);
         }
 
         .progress-bar {
             position: absolute;
-            bottom: 55px;
+            bottom: 70px;
             left: 0;
             width: 100%;
             height: 6px;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             cursor: pointer;
             opacity: 0;
-            transition: height 0.2s, opacity 0.3s;
+            transition: height 0.2s ease, opacity 0.3s ease;
         }
 
         .progress-bar:hover {
-            height: 8px;
+            height: 10px;
         }
 
         .progress-bar-filled {
             width: 0;
             height: 100%;
-            background: #ff0000;
+            background: linear-gradient(90deg, #ef5d7a, #ff9b6a);
             position: relative;
+            box-shadow: 0 0 12px rgba(239, 93, 122, 0.6);
         }
 
         .progress-bar-filled::after {
@@ -238,12 +300,13 @@
             right: 0;
             top: 50%;
             transform: translateY(-50%);
-            width: 14px;
-            height: 14px;
-            background: #ff0000;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #ef5d7a, #ff9b6a);
             border-radius: 50%;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 0 12px rgba(239, 93, 122, 0.8);
         }
 
         .progress-bar:hover .progress-bar-filled::after {
@@ -252,22 +315,20 @@
 
         .time-display {
             color: white;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
             user-select: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .playlist-container {
-            position: absolute;
-            top: 50%;
-            right: 0; /* No gap between player and episodes box */
-            transform: translateY(-50%);
-            width: 25%; /* Reduced width of the episodes box */
-            height: 80%;
-            background: #0f1720;
+            width: 320px;
+            height: 600px;
+            background: linear-gradient(135deg, #0f1720 0%, #1a2332 100%);
             overflow-y: auto;
-            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: opacity 0.3s ease;
         }
 
@@ -277,78 +338,141 @@
 
         .playlist-container h2 {
             color: white;
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 16px;
+            border-bottom: 2px solid rgba(239, 93, 122, 0.3);
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, rgba(239, 93, 122, 0.2), rgba(107, 140, 255, 0.2));
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .playlist-container ul {
             list-style: none;
-            padding: 0;
+            padding: 8px;
             margin: 0;
         }
 
         .playlist-container li {
-            padding: 10px;
+            padding: 12px;
             display: flex;
             align-items: center;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
         }
 
         .playlist-container li:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(107, 140, 255, 0.15);
+            border-color: rgba(107, 140, 255, 0.3);
+            transform: translateX(4px);
+        }
+
+        .playlist-container li.active {
+            background: linear-gradient(90deg, rgba(239, 93, 122, 0.2), rgba(107, 140, 255, 0.2));
+            border-color: rgba(239, 93, 122, 0.5);
+            box-shadow: 0 4px 12px rgba(239, 93, 122, 0.3);
         }
 
         .playlist-container img {
-            width: 60px;
-            height: 40px;
-            margin-right: 10px;
+            width: 80px;
+            height: 50px;
+            margin-right: 12px;
             object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        .playlist-container .active {
-            background: rgba(255, 255, 255, 0.2);
+        .playlist-container span {
+            font-size: 14px;
+            font-weight: 600;
         }
 
         .watermark {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.3);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.15);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
             pointer-events: none;
             z-index: 10;
             font-family: 'Arial Black', sans-serif;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
         .logo {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            width: 80px;
+            top: 20px;
+            left: 20px;
+            width: 90px;
             height: auto;
-            opacity: 0.7;
+            opacity: 0.5;
             pointer-events: none;
             z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .logo {
+            opacity: 0.8;
+        }
+
+        /* Custom scrollbar for playlist */
+        .playlist-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .playlist-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .playlist-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ef5d7a, #6b8cff);
+            border-radius: 4px;
+        }
+
+        .playlist-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff6b88, #7a9bff);
+        }
+
+        @media(max-width: 1200px) {
+            .player-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .playlist-container {
+                width: 100%;
+                max-width: 600px;
+                height: 400px;
+            }
+
+            .video-container.full-width {
+                max-width: 95%;
+            }
         }
     </style>
 </head>
 <body>
     <h1 id="anime-title">{% if anime %}{{ anime|title }}{% else %}Anime Video Player{% endif %}</h1>
-    <div class="video-container">
-        <img src="/static/uploads/Logo.jpeg" alt="Logo" class="logo">
-        <div class="watermark">TA</div>
-        <video id="anime-video" crossorigin="anonymous">
-            <source id="video-source" src="" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div class="progress-bar" id="progress-bar">
-            <div class="progress-bar-filled" id="progress-bar-filled"></div>
-        </div>
-        <div class="controls">
+    <div class="player-wrapper">
+        <div class="video-container">
+            <img src="/static/uploads/Logo.jpeg" alt="Logo" class="logo">
+            <div class="watermark">TA</div>
+            <video id="anime-video" crossorigin="anonymous" preload="metadata">
+                Your browser does not support the video tag.
+            </video>
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-bar-filled" id="progress-bar-filled"></div>
+            </div>
+            <div class="controls">
             <div class="controls-left">
                 <button id="play-pause">▶</button>
                 <div class="volume-container">
@@ -379,13 +503,13 @@
                 <button id="fullscreen">⛶</button>
             </div>
         </div>
-    </div>
 
-    <div class="playlist-container">
-        <h2>Episodes</h2>
-        <ul id="playlist">
-            <!-- Playlist items will be dynamically added here -->
-        </ul>
+        <div class="playlist-container">
+            <h2>Episodes</h2>
+            <ul id="playlist">
+                <!-- Playlist items will be dynamically added here -->
+            </ul>
+        </div>
     </div>
 
     <script>
@@ -613,14 +737,11 @@
         // If an external src is provided, use it directly; otherwise fetch episodes for the selected anime
         if (srcParam) {
             console.log('Using external source for playback:', srcParam);
-            // Remove type attribute to let browser auto-detect
-            const source = document.getElementById('video-source');
-            source.removeAttribute('type');
             video.src = srcParam;
             video.load();
             // Hide playlist for external sources
             playlistBox.classList.add('hidden');
-            videoContainer.classList.add('full-width');
+            document.querySelector('.player-wrapper').style.justifyContent = 'center';
         } else {
             const animeForFetch = animeParam ? encodeURIComponent(animeParam) : 'jujutsu%20kaisen';
             // Fetch episodes dynamically from the backend
